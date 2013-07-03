@@ -89,6 +89,10 @@ import ImageColor
 import unicodedata
 import time
 import datetime
+
+import dateutil.parser
+from pytz import timezone
+
 import tempfile
 from fcntl import ioctl
 import CDROM
@@ -1706,6 +1710,8 @@ def runMythtranscode(chanid, starttime, destination, usecutlist, localfile):
         cutlist_s += "'"
         write("Using cutlist: %s" % cutlist_s)
 
+    utcstart = dateutil.parser.parse(starttime).astimezone(timezone('UTC')).isoformat()
+
     if (localfile != ""):
         if usecutlist == True:
             command = "mythtranscode --mpeg2 --honorcutlist %s --infile %s --outfile %s" % (cutlist_s, quoteCmdArg(localfile), quoteCmdArg(destination))
@@ -1713,9 +1719,9 @@ def runMythtranscode(chanid, starttime, destination, usecutlist, localfile):
             command = "mythtranscode --mpeg2 --infile %s --outfile %s" % (quoteCmdArg(localfile), quoteCmdArg(destination))
     else:
         if usecutlist == True:
-            command = "mythtranscode --mpeg2 --honorcutlist --chanid %s --starttime %s --outfile %s" % (chanid, starttime, quoteCmdArg(destination))
+            command = "mythtranscode --mpeg2 --honorcutlist --chanid %s --starttime %s --outfile %s" % (chanid, utcstart, quoteCmdArg(destination))
         else:
-            command = "mythtranscode --mpeg2 --chanid %s --starttime %s --outfile %s" % (chanid, starttime, quoteCmdArg(destination))
+            command = "mythtranscode --mpeg2 --chanid %s --starttime %s --outfile %s" % (chanid, utcstart, quoteCmdArg(destination))
 
     result = runCommand(command)
 
